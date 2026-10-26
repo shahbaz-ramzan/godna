@@ -1,0 +1,539 @@
+// Participant Business Report – PDF markup styles (scoped under root, non-module)
+.reportScreenWrapper {
+  margin: 0;
+  font-size: 10px;
+  font-family: Calibri, "Helvetica Neue", sans-serif;
+  background: #f5f6fa;
+  min-width: 610px;
+  box-sizing: border-box;
+  min-height: 100vh;
+  overflow: visible;
+
+  /* --- Inner report tables (from original Angular styles) --- */
+  .insight-table {
+    margin-bottom: 1.5rem;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .insight-table th {
+    color: #ffffff;
+    font-size: 16px;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .insight-table td {
+    font-weight: 500;
+    padding: 6px;
+    font-size: 14px;
+  }
+
+  .bg-semidark {
+    background-color: #d0d8e8;
+    color: #000;
+  }
+
+  .bg-semilight {
+    background-color: #e9edf4;
+    color: #000;
+  }
+
+  .bg-medium-dark {
+    background-color: #376092;
+    color: #ffffff;
+  }
+
+  .bg-darkish {
+    background-color: #1a3462;
+    color: #ffffff;
+  }
+
+  .font-semibold {
+    font-weight: 600;
+  }
+
+  .portfolio-table {
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .mw-700 {
+    max-width: 700px;
+    width: 100%;
+  }
+
+  .portfolio-table th {
+    padding: 6px;
+    vertical-align: top;
+    text-align: center;
+  }
+
+  .portfolio-table td {
+    text-align: center;
+    padding: 6px;
+    font-size: 11px;
+  }
+
+  .vertical-align-top {
+    vertical-align: top;
+  }
+
+  .portfolio-anylasis-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .portfolio-anylasis-table th {
+    color: #ffffff;
+    padding: 6px;
+    font-size: 10px;
+    vertical-align: top;
+    text-align: left;
+  }
+
+  .portfolio-anylasis-table td {
+    padding: 6px;
+    vertical-align: top;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .potential-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .potential-table th {
+    color: #ffffff;
+    padding: 6px;
+    font-size: 10px;
+    text-align: center;
+  }
+
+  .potential-table td {
+    padding: 6px;
+    font-size: 11px;
+  }
+
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: auto;
+    max-width: 100%;
+  }
+
+  td {
+    overflow: visible;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .reportsWrapper {
+    padding-bottom: 24px;
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .reportsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.4rem 1.25rem;
+    background: white;
+    min-width: 610px;
+    margin: 0 auto 40px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-radius: 0;
+  }
+
+  .reportTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .arrow-left-btn {
+      &.ant-btn {
+        color: #7e84a3;
+        border-radius: 50%;
+      }
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      color: #131523;
+      font-weight: 500;
+    }
+  }
+
+  .reportsDownloadBtn {
+    background: #339966 !important;
+    border-color: #339966 !important;
+  }
+
+  /* View: normal width. PDF-only narrow layout is applied via inline styles during download. */
+  .reportPdfContent {
+    width: 610px;
+    max-width: 610px;
+    margin: 0 auto;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Calibri, "Helvetica Neue", sans-serif;
+    font-size: 10px;
+
+    table {
+      border-collapse: collapse;
+      border-spacing: 0;
+      width: 100%;
+    }
+
+    td {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+  }
+
+  .pageWrapper {
+    min-height: 790px;
+    padding: 20px;
+    margin: 0 auto 24px;
+    background-color: #fff;
+    position: relative;
+    box-sizing: border-box;
+
+    td.primaryColorBox {
+      height: 32px;
+      width: 23px;
+      background: #339966;
+    }
+
+    .mainHeading {
+      font-size: 16px;
+      font-weight: 700;
+      color: #339966;
+      padding-left: 16px;
+    }
+
+    p,
+    ul li {
+      line-height: 17px;
+      color: #000;
+      font-size: 14px;
+    }
+
+    a {
+      color: #000000;
+    }
+
+    ul {
+      margin-top: 0;
+      // padding-left: 25px;
+      padding-left: 10px;
+      margin-bottom: 5px;
+      list-style: none;
+    }
+
+    h5 {
+      font-weight: 700;
+      font-size: 14px;
+      color: #000000;
+    }
+
+    ul li {
+      margin-bottom: 5px;
+      padding-left: 20px;
+      position: relative;
+
+      &::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-weight: bold;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .pageFooter {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    padding: 0 4px;
+    text-align: center;
+    box-sizing: border-box;
+    background-color: #fff;
+    border-top: solid 2px #979797;
+
+    table {
+      width: 100%;
+    }
+
+    td {
+      color: #979797;
+      padding: 10px;
+      font-size: 10px;
+    }
+  }
+
+  .textLeft {
+    text-align: left;
+  }
+
+  .textRight {
+    text-align: right;
+  }
+
+  .textCenter {
+    text-align: center;
+  }
+
+  .spacer20 {
+    height: 16px;
+  }
+
+  .spacer10 {
+    height: 10px;
+  }
+
+  .spacer40 {
+    height: 40px;
+  }
+
+  .spacer50 {
+    height: 50px;
+  }
+
+  .p0 {
+    padding: 0;
+  }
+
+  .mb0 {
+    margin-bottom: 0;
+  }
+
+  .mb35 {
+    margin-bottom: 35px;
+  }
+
+  .pb16 {
+    padding-bottom: 16px;
+  }
+
+  .pl20 {
+    padding-left: 20px;
+  }
+
+  .patternBanner {
+    height: 222px;
+    padding: 0 15px;
+    background-image: url("../../../assets/images/pattern-img.jpg");
+    background-repeat: repeat;
+
+    p {
+      background-color: #fff;
+      padding: 16px;
+      border: solid 1px #000;
+    }
+  }
+
+  .reportCard {
+    padding: 45px 38px;
+    border-top: solid 10px #339966;
+    border-bottom: solid 10px #339966;
+
+    img {
+      max-height: 60px;
+    }
+
+    h1 {
+      font-size: 28px;
+      line-height: 31px;
+      color: #000000;
+      margin: 16px 0 15px;
+      font-weight: 700;
+    }
+
+    p {
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 25px;
+      color: #5f5a5a;
+      margin-top: 0;
+      margin-bottom: 5px;
+    }
+  }
+
+  .footerTop {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    background: #339966;
+  }
+
+  .footer {
+    font-size: 12px;
+    color: #808080;
+    padding: 5px;
+    text-align: center;
+  }
+
+  .headingBdna {
+    font-weight: 700;
+    font-size: 14px;
+    color: #000000;
+  }
+
+  .pBdna {
+    font-weight: 400;
+    font-size: 14px;
+    color: #000000;
+  }
+
+  .facilitatorHead {
+    font-weight: 700 !important;
+    font-size: 32px !important;
+  }
+
+  .tdBackground {
+    background-color: #ededed;
+  }
+
+  .tdPadding {
+    padding: 10px;
+  }
+
+  p.page-text {
+    margin-bottom: 1rem;
+  }
+
+  .financialInsightWrap {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+
+    & + .financialInsightWrap {
+      margin-top: 15px;
+    }
+
+    h6 {
+      font-size: 1.125rem;
+      color: #000;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    p {
+      font-size: 14px;
+      font-weight: 400;
+      color: #000;
+      margin-bottom: 0;
+    }
+  }
+
+  .badgeLock {
+    height: 40px;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #339966;
+    border-radius: 50%;
+    margin: auto;
+  }
+
+  .iconLock {
+    font-size: 18px;
+    color: #fff;
+  }
+
+  .lockHeading {
+    h5 {
+      font-weight: 700;
+      font-size: 14px;
+      color: #339966;
+      margin-bottom: 0;
+    }
+
+    p {
+      font-size: 14px;
+      color: #339966;
+    }
+  }
+
+  .qrCodeContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+
+    .qrPlaceholder {
+      width: 105px;
+      height: 105px;
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #666;
+    }
+  }
+
+  .qrCodeText {
+    text-align: center;
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #000;
+    line-height: 17px;
+  }
+
+  .slider-container {
+    width: 100%;
+    height: 6px;
+    background-color: #ddd;
+    position: relative;
+    border-radius: 2px;
+  }
+
+  .slider-track {
+    height: 100%;
+    width: 100%;
+    border: 1px solid #000;
+    background-color: #bbb;
+    border-radius: 2px;
+  }
+
+  .slider-thumb {
+    width: 6px;
+    height: 20px;
+    position: absolute;
+    top: 50%;
+    /* left: 0%; */
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+  }
+
+  .portfolio-table {
+    margin-bottom: 1rem;
+  }
+
+  .portfolio-table th {
+    padding: 6px;
+    vertical-align: top;
+  }
+
+  .portfolio-table td {
+    text-align: center;
+  }
+}

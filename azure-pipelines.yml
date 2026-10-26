@@ -1,0 +1,218 @@
+trigger:
+  - development
+
+pr:
+  - development
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  nodeVersion: "20.x"
+
+stages:
+  # =========================
+  # BUILD DEV
+  # =========================
+  - stage: Build_Dev
+    displayName: Build Dev
+    jobs:
+      - job: BuildDevJob
+        displayName: Build Next.js with DEV variables
+        steps:
+          - checkout: self
+            submodules: true
+
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "$(nodeVersion)"
+            displayName: "Use Node.js $(nodeVersion)"
+
+          - script: |
+              corepack enable
+              yarn --version
+            displayName: "Enable Corepack (Yarn)"
+
+          - script: |
+              echo '$(DEV_FE_ENV_VAR)' | node -e "
+                const fs = require('fs');
+                let data = '';
+                process.stdin.on('data', chunk => data += chunk);
+                process.stdin.on('end', () => {
+                  const obj = JSON.parse(data);
+                  const envContent = Object.entries(obj)
+                    .map(([k, v]) => \`\${k}=\${v}\`)
+                    .join('\n');
+                  fs.writeFileSync('.env.local', envContent);
+                  console.log('Written .env.local with', Object.keys(obj).length, 'DEV variables');
+                });
+              "
+            displayName: "Inject DEV environment variables"
+            workingDirectory: "$(Build.SourcesDirectory)"
+
+          - script: |
+              set -e
+              export NODE_OPTIONS=--max_old_space_size=4096
+              yarn install --frozen-lockfile
+              yarn build
+            displayName: "Install dependencies and build (DEV)"
+            workingDirectory: "$(Build.SourcesDirectory)"
+
+          - script: |
+              set -e
+              mkdir -p "$(Build.ArtifactStagingDirectory)/dev"
+              if [ ! -d "$(Build.SourcesDirectory)/.next" ]; then
+                echo "ERROR: .next missing after build — hybrid deploy cannot run."
+                exit 1
+              fi
+              # Ship source + .next + node_modules (SWA hybrid Next needs deps at runtime).
+              # Omit .git and build cache only to shrink the artifact.
+              rsync -a \
+                --exclude='.git' \
+                --exclude='.next/cache' \
+                "$(Build.SourcesDirectory)/" \
+                "$(Build.ArtifactStagingDirectory)/dev/"
+            displayName: "Stage DEV artifact for SWA (hybrid Next.js)"
+
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: "$(Build.ArtifactStagingDirectory)/dev"
+              artifact: "dev_build"
+            displayName: "Publish DEV artifact"
+
+  # =========================
+  # DEPLOY DEV
+  # =========================
+  - stage: Deploy_Dev
+    displayName: Deploy Dev
+    dependsOn: Build_Dev
+    jobs:
+      - deployment: DeployDev
+        displayName: Deploy to Azure Static Web App (Dev)
+        environment: Dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    source: "current"
+                    artifact: "dev_build"
+                    path: "$(Build.ArtifactStagingDirectory)/dev"
+                  displayName: "Download DEV artifact"
+
+                - task: AzureStaticWebApp@0
+                  displayName: "Deploy to Azure Static Web App (Dev)"
+                  inputs:
+                    workingDirectory: "$(Build.ArtifactStagingDirectory)/dev"
+                    app_location: "/"
+                    api_location: ""
+                    output_location: ".next"
+                    skip_app_build: false
+                    skip_api_build: false
+                    azure_static_web_apps_api_token: "$(SWA_DEV_TOKEN)"
+                  env:
+                    NEXT_TELEMETRY_DISABLED: 1
+                    NODE_OPTIONS: "--max_old_space_size=4096"
+
+  # =========================
+  # BUILD QA
+  # =========================
+  - stage: Build_QA
+    displayName: Build QA
+    jobs:
+      - job: BuildQAJob
+        displayName: Build Next.js with QA variables
+        steps:
+          - checkout: self
+            submodules: true
+
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "$(nodeVersion)"
+            displayName: "Use Node.js $(nodeVersion)"
+
+          - script: |
+              corepack enable
+              yarn --version
+            displayName: "Enable Corepack (Yarn)"
+
+          - script: |
+              echo '$(QA_FE_ENV_VAR)' | node -e "
+                const fs = require('fs');
+                let data = '';
+                process.stdin.on('data', chunk => data += chunk);
+                process.stdin.on('end', () => {
+                  const obj = JSON.parse(data);
+                  const envContent = Object.entries(obj)
+                    .map(([k, v]) => \`\${k}=\${v}\`)
+                    .join('\n');
+                  fs.writeFileSync('.env.local', envContent);
+                  console.log('Written .env.local with', Object.keys(obj).length, 'QA variables');
+                });
+              "
+            displayName: "Inject QA environment variables"
+            workingDirectory: "$(Build.SourcesDirectory)"
+
+          - script: |
+              set -e
+              export NODE_OPTIONS=--max_old_space_size=4096
+              yarn install --frozen-lockfile
+              yarn build
+            displayName: "Install dependencies and build (QA)"
+            workingDirectory: "$(Build.SourcesDirectory)"
+
+          - script: |
+              set -e
+              mkdir -p "$(Build.ArtifactStagingDirectory)/qa"
+              if [ ! -d "$(Build.SourcesDirectory)/.next" ]; then
+                echo "ERROR: .next missing after build."
+                exit 1
+              fi
+              rsync -a \
+                --exclude='.git' \
+                --exclude='.next/cache' \
+                "$(Build.SourcesDirectory)/" \
+                "$(Build.ArtifactStagingDirectory)/qa/"
+            displayName: "Stage QA artifact for SWA (hybrid Next.js)"
+
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: "$(Build.ArtifactStagingDirectory)/qa"
+              artifact: "qa_build"
+            displayName: "Publish QA artifact"
+
+  # =========================
+  # DEPLOY QA
+  # =========================
+  - stage: Deploy_QA
+    displayName: Deploy QA
+    dependsOn: Build_QA
+    jobs:
+      - deployment: DeployQA
+        displayName: Deploy to Azure Static Web App (QA)
+        environment: QA
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    source: "current"
+                    artifact: "qa_build"
+                    path: "$(Build.ArtifactStagingDirectory)/qa"
+                  displayName: "Download QA artifact"
+
+                - task: AzureStaticWebApp@0
+                  displayName: "Deploy to Azure Static Web App (QA)"
+                  inputs:
+                    workingDirectory: "$(Build.ArtifactStagingDirectory)/qa"
+                    app_location: "/"
+                    api_location: ""
+                    output_location: ".next"
+                    skip_app_build: false
+                    skip_api_build: false
+                    azure_static_web_apps_api_token: "$(SWA_QA_TOKEN)"
+                  env:
+                    NEXT_TELEMETRY_DISABLED: 1
+                    NODE_OPTIONS: "--max_old_space_size=4096"

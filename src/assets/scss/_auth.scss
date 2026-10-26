@@ -1,0 +1,111 @@
+.thm-auth {
+  @apply flex max-lg:min-h-screen;
+  &.thm-auth-v2 {
+    @apply flex justify-center min-h-screen;
+    .auth-wrap {
+      @apply w-full max-w-full;
+    }
+  }
+  .auth-wrap,
+  .auth-image {
+    @apply lg:max-w-[50%] w-full;
+  }
+  .auth-wrap {
+    @apply z-[2] lg:p-[1.5rem] flex-grow-1 flex items-center max-lg:p-[2rem];
+  }
+  .auth-image {
+    @apply lg:min-h-screen max-lg:fixed max-lg:w-full max-lg:h-full relative;
+    img {
+      @apply w-full h-full object-cover absolute top-0 right-0;
+    }
+  }
+}
+
+.chargify-form-wrapper {
+  h2.ant-typography {
+    &.cf-payment-title {
+      @apply mb-4 text-lg font-semibold;
+    }
+  }
+  .cf-error-message {
+    @apply mb-4 text-sm text-red-600 border border-red-200 bg-red-50 p-3 rounded;
+  }
+  .chargify-form {
+    .cf-form-item {
+      label {
+        @apply text-sm hidden leading-none font-medium w-full mb-2;
+      }
+      .cf-text-box {
+        @apply text-foreground w-full text-base border-0;
+        iframe {
+          @apply w-full!;
+        }
+      }
+    }
+  }
+}
+
+// new login page styles
+.login-hero-section {
+  @apply max-md:py-20;
+  .login-hero-row {
+    @apply min-h-screen;
+  }
+  .lh-content {
+    @apply max-md:text-center;
+    .login-logo {
+      @apply lg:max-w-[230px] md:max-w-[190px] max-md:max-w-[160px] h-auto md:mb-8 max-md:mb-6 max-md:inline-block;
+    }
+
+    h1 {
+      @apply text-[#111827] lg:text-[2.25rem] max-lg:text-[2rem] leading-[1.2] font-semibold mb-8;
+    }
+
+    p {
+      @apply text-[#6B7280] lg:text-[1.125rem] max-lg:text-[1rem] leading-[122%] mb-8 max-w-[500px] max-md:mx-auto;
+    }
+
+    .lh-actions {
+      @apply flex items-center gap-3 max-md:justify-center;
+
+      .ant-btn {
+        @apply h-[40px] min-w-[120px] px-4 rounded-[10px] font-medium border-0 shadow-none transition-all duration-300;
+        svg {
+          @apply transition-transform w-4 h-4;
+        }
+        &:hover:not(:disabled):not(.ant-btn-disabled) {
+          @apply scale-[1.02] shadow-xl;
+          svg {
+            @apply translate-x-1;
+          }
+        }
+        &:disabled,
+        &.ant-btn-disabled {
+          @apply opacity-60 cursor-not-allowed;
+        }
+      }
+
+      .login-btn {
+        @apply bg-[#339966] text-white;
+        &:hover:not(:disabled):not(.ant-btn-disabled) {
+          @apply shadow-[#339966]/20 bg-[#2d8659] text-white;
+        }
+      }
+
+      .signup-btn {
+        @apply bg-[#e5e7eb] text-[#111827];
+        &:hover:not(:disabled):not(.ant-btn-disabled) {
+          @apply shadow-[#111827]/20;
+        }
+      }
+    }
+  }
+
+  .lh-image-wrap {
+    @apply flex max-md:justify-center md:justify-end;
+
+    .login-hero-image {
+      @apply w-full max-w-[350px] h-auto;
+    }
+  }
+}

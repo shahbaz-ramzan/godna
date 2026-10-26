@@ -1,0 +1,435 @@
+trigger:
+  - main
+
+pr:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  nodeVersion: "20.x"
+
+stages:
+# =========================
+# BUILD Sandbox
+# =========================
+  - stage: Build_Sandbox
+    displayName: Build Sandbox
+    jobs:
+      - job: BuildSandboxJob
+        displayName: Build Next.js with Sandbox variables
+        steps:
+          - checkout: self
+            submodules: true
+
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '$(nodeVersion)'
+            displayName: 'Use Node.js $(nodeVersion)'
+
+          - script: |
+              corepack enable
+              yarn --version
+            displayName: 'Enable Corepack (Yarn)'
+
+          - script: |
+              echo '$(SANDBOX_FE_ENV_VAR)' | node -e "
+                const fs = require('fs');
+                let data = '';
+                process.stdin.on('data', chunk => data += chunk);
+                process.stdin.on('end', () => {
+                  const obj = JSON.parse(data);
+                  const envContent = Object.entries(obj)
+                    .map(([k, v]) => \`\${k}=\${v}\`)
+                    .join('\n');
+                  fs.writeFileSync('.env.local', envContent);
+                  console.log('Written .env.local with', Object.keys(obj).length, 'Sandbox variables');
+                });
+              "
+            displayName: 'Inject Sandbox environment variables'
+            workingDirectory: "$(Build.SourcesDirectory)"
+
+          - script: |
+              set -e
+              export NODE_OPTIONS=--max_old_space_size=4096
+              yarn install --frozen-lockfile
+              yarn build
+            displayName: "Install dependencies and build (Sandbox)"
+            workingDirectory: "$(Build.SourcesDirectory)"
+
+          - script: |
+              set -e
+              mkdir -p "$(Build.ArtifactStagingDirectory)/Sandbox"
+              if [ ! -d "$(Build.SourcesDirectory)/.next" ]; then
+                echo "ERROR: .next missing after build — hybrid deploy cannot run."
+                exit 1
+              fi
+              rsync -a \
+                --exclude='.git' \
+                --exclude='.next/cache' \
+                "$(Build.SourcesDirectory)/" \
+                "$(Build.ArtifactStagingDirectory)/Sandbox/"
+            displayName: 'Copy Sandbox build (exclude node_modules)'
+
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: "$(Build.ArtifactStagingDirectory)/Sandbox"
+              artifact: 'Sandbox_build'
+            displayName: 'Publish Sandbox artifact'
+
+# =========================
+# DEPLOY Sandbox
+# =========================
+  - stage: Deploy_Sandbox
+    displayName: Deploy Sandbox
+    dependsOn: Build_Sandbox
+    jobs:
+      - deployment: DeploySandbox
+        displayName: Deploy to Azure Static Web App (Sandbox)
+        environment: GoDNA-Sandbox
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    source: "current"
+                    artifact: "Sandbox_build"
+                    path: "$(Build.ArtifactStagingDirectory)/Sandbox"
+                  displayName: "Download Sandbox artifact"
+
+                - task: AzureStaticWebApp@0
+                  displayName: "Deploy to Azure Static Web App (Sandbox)"
+                  inputs:
+                    workingDirectory: "$(Build.ArtifactStagingDirectory)/Sandbox"
+                    app_location: "/"
+                    api_location: ""
+                    output_location: ".next"
+                    skip_app_build: false
+                    skip_api_build: false
+                    azure_static_web_apps_api_token: "$(SWA_Sandbox_TOKEN)"
+                  env:
+                      NEXT_TELEMETRY_DISABLED: 1
+                      NODE_OPTIONS: "--max_old_space_size=4096"
+
+# =========================
+# BUILD Prod
+# =========================
+  - stage: Build_Prod
+    displayName: Build Prod
+    jobs:
+      - job: BuildProdJob
+        displayName: Build Next.js with Prod variables
+        steps:
+          - checkout: self
+            submodules: true
+
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "$(nodeVersion)"
+            displayName: "Use Node.js $(nodeVersion)"
+
+          - script: |
+              corepack enable
+              yarn --version
+            displayName: "Enable Corepack (Yarn)"
+
+          - script: |
+              echo '$(Prod_FE_ENV_VAR)' | node -e "
+                const fs = require('fs');
+                let data = '';
+                process.stdin.on('data', chunk => data += chunk);
+                process.stdin.on('end', () => {
+                  const obj = JSON.parse(data);
+                  const envContent = Object.entries(obj)
+                    .map(([k, v]) => \`\${k}=\${v}\`)
+                    .join('\n');
+                  fs.writeFileSync('.env.local', envContent);
+                  console.log('Written .env.local with', Object.keys(obj).length, 'Prod variables');
+                });
+              "
+            displayName: 'Inject Prod environment variables'
+            workingDirectory: "$(Build.SourcesDirectory)"
+
+          - script: |
+              set -e
+              export NODE_OPTIONS=--max_old_space_size=4096
+              yarn install --frozen-lockfile
+              yarn build
+            displayName: 'Install dependencies and build (Prod)'
+            workingDirectory: "$(Build.SourcesDirectory)"
+
+          - script: |
+              set -e
+              mkdir -p $(Build.ArtifactStagingDirectory)/Prod
+              if [ ! -d "$(Build.SourcesDirectory)/.next" ]; then
+                echo "ERROR: .next missing after build."
+                exit 1
+              fi
+              rsync -a \
+                --exclude='.git' \
+                --exclude='.next/cache' \
+                "$(Build.SourcesDirectory)/" \
+                "$(Build.ArtifactStagingDirectory)/Prod/"
+            displayName: 'Copy Prod build (exclude node_modules)'
+
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)/Prod'
+              artifact: 'Prod_build'
+            displayName: 'Publish Prod artifact'
+
+# =========================
+# DEPLOY Prod
+# =========================
+  - stage: Deploy_Prod
+    displayName: Deploy Prod
+    dependsOn: Build_Prod
+    jobs:
+      - deployment: DeployProd
+        displayName: Deploy to Azure Static Web App (Prod)
+        environment: GoDNA-Prod
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    source: "current"
+                    artifact: "Prod_build"
+                    path: "$(Build.ArtifactStagingDirectory)/Prod"
+                  displayName: "Download Prod artifact"
+
+                - task: AzureStaticWebApp@0
+                  displayName: "Deploy to Azure Static Web App (Prod)"
+                  inputs:
+                    workingDirectory: "$(Build.ArtifactStagingDirectory)/Prod"
+                    app_location: "/"
+                    api_location: ""
+                    output_location: ".next"
+                    skip_app_build: false
+                    skip_api_build: false
+                    azure_static_web_apps_api_token: "$(SWA_Prod_TOKEN)"
+                  env:
+                      NEXT_TELEMETRY_DISABLED: 1
+                      NODE_OPTIONS: "--max_old_space_size=4096"
+
+# trigger:
+#   - main
+
+# pr:
+#   - main
+
+# pool:
+#   vmImage: ubuntu-latest
+
+# variables:
+#   nodeVersion: "20.x"
+
+# stages:
+# # =========================
+# # BUILD Sandbox
+# # =========================
+#   - stage: Build_Sandbox
+#     displayName: Build Sandbox
+#     jobs:
+#       - job: BuildSandboxJob
+#         displayName: Build Next.js with Sandbox variables
+#         steps:
+#           - checkout: self
+#             submodules: true
+
+#       - task: NodeTool@0
+#         inputs:
+#           versionSpec: '$(nodeVersion)'
+#         displayName: 'Use Node.js $(nodeVersion)'
+
+#       - script: |
+#           corepack enable
+#           yarn --version
+#         displayName: 'Enable Corepack (Yarn)'
+
+#       - script: |
+#           echo '$(SANDBOX_FE_ENV_VAR)' | node -e "
+#             const fs = require('fs');
+#             let data = '';
+#             process.stdin.on('data', chunk => data += chunk);
+#             process.stdin.on('end', () => {
+#               const obj = JSON.parse(data);
+#               const envContent = Object.entries(obj)
+#                 .map(([k, v]) => \`\${k}=\${v}\`)
+#                 .join('\n');
+#               fs.writeFileSync('.env.local', envContent);
+#               console.log('Written .env.local with', Object.keys(obj).length, 'Sandbox variables');
+#             });
+#           "
+#         displayName: 'Inject Sandbox environment variables'
+#         workingDirectory: "$(Build.SourcesDirectory)"
+
+#       - script: |
+#           set -e
+#           export NODE_OPTIONS=--max_old_space_size=4096
+#           yarn install --frozen-lockfile
+#           yarn build
+#         displayName: "Install dependencies and build (Sandbox)"
+#         workingDirectory: "$(Build.SourcesDirectory)"
+
+#       - script: |
+#           set -e
+#           mkdir -p "$(Build.ArtifactStagingDirectory)/Sandbox"
+#           if [ ! -d "$(Build.SourcesDirectory)/.next" ]; then
+#             echo "ERROR: .next missing after build — hybrid deploy cannot run."
+#             exit 1
+#           fi
+#           rsync -a \
+#             --exclude='.git' \
+#             --exclude='.next/cache' \
+#             "$(Build.SourcesDirectory)/" \
+#             "$(Build.ArtifactStagingDirectory)/Sandbox/"
+#         displayName: 'Copy Sandbox build (exclude node_modules)'
+
+#       - task: PublishPipelineArtifact@1
+#         inputs:
+#           targetPath: "$(Build.ArtifactStagingDirectory)/Sandbox"
+#           artifact: 'Sandbox_build'
+#         displayName: 'Publish Sandbox artifact'
+
+# # =========================
+# # DEPLOY Sandbox
+# # =========================
+#   - stage: Deploy_Sandbox
+#     displayName: Deploy Sandbox
+#     dependsOn: Build_Sandbox
+#     jobs:
+#       - deployment: DeploySandbox
+#         displayName: Deploy to Azure Static Web App (Sandbox)
+#         environment: GoDNA-Sandbox
+#         strategy:
+#           runOnce:
+#             deploy:
+#               steps:
+#               - task: DownloadPipelineArtifact@2
+#                 inputs:
+#                   source: "current"
+#                   artifact: "Sandbox_build"
+#                   path: "$(Build.ArtifactStagingDirectory)/Sandbox"
+#                   #versionSpec: "$(nodeVersion)"
+#                 displayName: "Use Node.js $(nodeVersion)"
+          
+#               - task: AzureStaticWebApp@0
+#                 displayName: "Deploy to Azure Static Web App (Sandboox)"
+#                 inputs:
+#                   workingDirectory: "$(Build.ArtifactStagingDirectory)/Sandbox"
+#                   app_location: "/"
+#                   api_location: ""
+#                   output_location: ".next"
+#                   skip_app_build: false
+#                   skip_api_build: false
+#                   azure_static_web_apps_api_token: "$(SWA_Sandbox_TOKEN)"
+#                   env:
+#                     NEXT_TELEMETRY_DISABLED: 1
+#                     NODE_OPTIONS: "--max_old_space_size=4096"
+
+# # =========================
+# # BUILD Prod
+# # =========================
+#   - stage: Build_Prod
+#     displayName: Build Prod
+#     #dependsOn: Deploy_Sandbox
+#     jobs:
+#       - job: BuildProdJob
+#         displayName: Build Next.js with Prod variables
+#         steps:
+#           - checkout: self
+#             submodules: true
+          
+#           - task: NodeTool@0
+#             inputs:
+#               versionSpec: "$(nodeVersion)"
+#             displayName: "Use Node.js $(nodeVersion)"
+
+#         - script: |
+#             corepack enable
+#             yarn --version
+#           displayName: "Enable Corepack (Yarn)"
+
+#         - script: |
+#             echo '$(Prod_FE_ENV_VAR)' | node -e "
+#               const fs = require('fs');
+#               let data = '';
+#               process.stdin.on('data', chunk => data += chunk);
+#               process.stdin.on('end', () => {
+#                 const obj = JSON.parse(data);
+#                 const envContent = Object.entries(obj)
+#                   .map(([k, v]) => \`\${k}=\${v}\`)
+#                   .join('\n');
+#                 fs.writeFileSync('.env.local', envContent);
+#                 console.log('Written .env.local with', Object.keys(obj).length, 'Prod variables');
+#               });
+#             "
+#           displayName: 'Inject Prod environment variables'
+#           workingDirectory: "$(Build.SourcesDirectory)"
+
+#       - script: |
+#           set -e
+#           export NODE_OPTIONS=--max_old_space_size=4096
+#           yarn install --frozen-lockfile
+#           yarn build
+#         displayName: 'Install dependencies and build (Prod)'
+#         workingDirectory: "$(Build.SourcesDirectory)"
+
+#       - script: |
+#           set -e
+#           mkdir -p $(Build.ArtifactStagingDirectory)/Prod
+#           if [ ! -d "$(Build.SourcesDirectory)/.next" ]; then
+#             echo "ERROR: .next missing after build."
+#             exit 1
+#           fi
+#           rsync -a \
+#             --exclude='.git' \
+#             --exclude='.next/cache' \
+#             "$(Build.SourcesDirectory)/" \
+#             "$(Build.ArtifactStagingDirectory)/Prod/"
+#         displayName: 'Copy Prod build (exclude node_modules)'
+
+#       - task: PublishPipelineArtifact@1
+#         inputs:
+#           targetPath: '$(Build.ArtifactStagingDirectory)/Prod'
+#           artifact: 'Prod_build'
+#         displayName: 'Publish Prod artifact'
+
+# # =========================
+# # DEPLOY Prod
+# # =========================
+#   - stage: Deploy_Prod
+#     displayName: Deploy Prod
+#     dependsOn: Build_Prod
+#     jobs:
+#     - deployment: DeploProd
+#       displayName: Deploy to Azure Static Web App (Prod)
+#       environment: GoDNA-Prod
+#       strategy:
+#         runOnce:
+#           deploy:
+#             steps:
+#             - task: DownloadPipelineArtifact@2
+#               inputs:
+#                 source: "current"
+#                 artifact: "Prod_build"
+#                 path: "$(Build.ArtifactStagingDirectory)/Prod"
+#               displayName: "Download Prod artifact"
+
+#           - task: AzureStaticWebApp@0
+#               displayName: "Deploy to Azure Static Web App (Prod)""
+#               inputs:
+#                 workingDirectory: "$(Build.ArtifactStagingDirectory)/Prod"
+#                 app_location: "/"
+#                 api_location: ""
+#                 output_location: ".next"
+#                 skip_app_build: false
+#                 skip_api_build: false
+#                 azure_static_web_apps_api_token: "$(SWA_Prod_TOKEN)"
+#               env:
+#                 NEXT_TELEMETRY_DISABLED: 1
+#                 NODE_OPTIONS: "--max_old_space_size=4096"

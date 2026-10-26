@@ -1,0 +1,227 @@
+body {
+  font-family:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+}
+html {
+  @apply scroll-smooth max-sm:text-[14px];
+}
+img {
+  @apply max-w-full;
+}
+
+p {
+  margin: 0;
+}
+
+.main-content-wrapper {
+  @apply bg-white pt-20 overflow-hidden;
+  &.auth-page {
+    @apply bg-[#f8f9fa] pt-0;
+  }
+  &.login-page-wrapper {
+    @apply pt-0;
+  }
+}
+.join-waitlist-link {
+  @apply flex items-center justify-center gap-2 rounded-full bg-[#287850] px-6 py-5 text-base font-normal text-white shadow-lg transition-all duration-300;
+  svg {
+    @apply transition-transform w-5 h-5;
+  }
+  &:hover {
+    @apply scale-[1.02] shadow-xl shadow-[#339966]/20 bg-[#2d8659] text-white;
+    svg {
+      @apply translate-x-1;
+    }
+  }
+  &.login-btn.ant-btn,
+  &.sign-btn.ant-btn {
+    @apply rounded-full px-6;
+  }
+}
+.btn-link {
+  @apply bg-[#00B795] text-[1rem] font-medium min-h-[40px] py-2 px-4 rounded-lg text-white inline-block transition-all duration-500;
+  &:hover {
+    @apply text-white bg-[#1fc4a1];
+  }
+}
+.btn-edit {
+  &:hover {
+    svg,
+    i {
+      @apply text-[#003366];
+    }
+  }
+}
+.btn-logout {
+  &.ant-btn {
+    @apply p-0! !max-h-[22px] w-full justify-start;
+    span {
+      @apply text-left!;
+    }
+  }
+}
+
+// client dashboard
+.glass-card {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  background: #ffffffd9;
+  border: 1px solid #fff3;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px #00000014;
+}
+
+.dna-gradient {
+  background: linear-gradient(135deg, #004e92 0%, #00c9a7 100%);
+  color: #fff;
+}
+
+.dna-gradient-soft {
+  background: linear-gradient(135deg, #004e921a 0%, #00c9a71a 100%);
+}
+
+.gradient-username {
+  background: linear-gradient(90deg, #00c9a7 0%, #007a5a 50%, #00c9a7 100%) 0
+    0 / 200% 100%;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: 6s linear infinite gradient-shimmer;
+}
+
+.thm-tabs {
+  &.ant-tabs {
+    .ant-tabs-nav {
+      .ant-tabs-nav-wrap {
+        .ant-tabs-nav-list {
+          @apply md:w-full bg-muted rounded-3xl p-1;
+          .ant-tabs-tab {
+            @apply justify-center text-center w-full px-2 py-1;
+            .ant-tabs-tab-btn {
+              @apply text-foreground font-medium text-sm flex items-center;
+              .ant-tabs-tab-icon {
+                svg {
+                  @apply w-4 h-4;
+                }
+              }
+            }
+            &.ant-tabs-tab-active {
+              @apply bg-white rounded-3xl;
+            }
+          }
+          .ant-tabs-ink-bar {
+            @apply hidden;
+          }
+        }
+      }
+      .ant-tabs-nav-operations {
+        @apply hidden;
+      }
+    }
+    &.setting-tabs {
+      .ant-tabs-nav {
+        .ant-tabs-nav-wrap {
+          .ant-tabs-nav-list {
+            @apply w-auto;
+            .ant-tabs-tab {
+              @apply ml-0;
+              .ant-tabs-tab-btn {
+                span {
+                  @apply text-sm font-medium;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.thm-btn.ant-btn {
+  @apply text-sm font-medium transition-all text-white! rounded-[14px]! border border-transparent;
+  background: linear-gradient(135deg, #004e92 0%, #00c9a7 100%) !important;
+  &:hover {
+    @apply opacity-90;
+  }
+  &:not(:disabled):not(.ant-btn-disabled):hover {
+    @apply opacity-90 border-transparent text-white;
+  }
+  &:disabled,
+  &.ant-btn-disabled {
+    @apply opacity-60 cursor-not-allowed;
+  }
+}
+
+.thm-secondary-btn.ant-btn {
+  @apply text-sm font-medium transition-all rounded-[14px]! border-[#D1D3D7] bg-[#f8f9fa] text-foreground!;
+  &:hover {
+    @apply bg-accent text-foreground;
+  }
+  &:not(:disabled):not(.ant-btn-disabled):hover {
+    @apply bg-accent bg-[#f8f9fa] text-foreground;
+  }
+  &:disabled,
+  &.ant-btn-disabled {
+    @apply opacity-60 cursor-not-allowed bg-[#f8f9fa];
+    &:hover {
+      @apply bg-[#f8f9fa] text-foreground!;
+    }
+  }
+}
+
+.thm-switch.ant-switch {
+  .ant-switch-inner {
+    &:not(.ant-switch-checked) {
+      @apply bg-[#cbced4];
+    }
+  }
+
+  &.ant-switch-checked {
+    .ant-switch-inner {
+      @apply bg-blue;
+    }
+  }
+}
+
+a.learn-more-cta {
+  @apply text-[#339966] inline-flex items-center gap-2 transition-all mt-6 cursor-pointer;
+  svg {
+    @apply w-4 h-4 transition-transform;
+  }
+  &:hover {
+    @apply gap-3 text-[#339966];
+    svg {
+      @apply translate-x-1;
+    }
+  }
+}
+
+.auth-wrapper {
+  @apply min-h-screen flex items-center justify-center py-12 px-4;
+}
+
+.right-arrow-hover {
+  @apply h-4 w-4 text-muted-foreground;
+}
+
+     .outline-btn.ant-btn {
+       @apply inline-flex items-center justify-center gap-2 border cursor-pointer whitespace-nowrap rounded-xl text-sm font-medium transition-all h-9 px-4 py-2 border-[#D1D3D7] bg-[#f8f9fa] text-foreground;
+       &:hover:not(:disabled):not(.ant-btn-disabled) {
+         @apply text-foreground! bg-accent! border-[#D1D3D7]!;
+       }
+  
+       svg {
+         @apply mr-2 h-5 w-5;
+       }
+     }
+
+@keyframes gradient-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

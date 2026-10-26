@@ -1,0 +1,42 @@
+@use "tailwindcss";
+@use "global";
+@use "auth";
+@use "layout";
+@use "dashboard";
+@use "modal";
+@use "settings";
+@use "forms";
+@use "table";
+@use "landingPage";
+@use "card";
+@use "geneAIChatbot";
+
+@theme {
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1600px;
+  --color-primary: #00b795;
+  --color-foreground: #0f172a;
+  --color-muted: #ececf0;
+  --color-muted-foreground: #64748b;
+  --color-accent: #e9ebef;
+  --color-warning: #f59e0b;
+  --color-background: #f8f9fa;
+  --color-blue: #0078ff;
+  --color-destructive: #ef4444;
+  --color-lightGray: #0000001a;
+}
+
+/* Hide Wonderchat widget on routes where ChatbotController sets data-chatbot-hidden */
+body[data-chatbot-hidden] {
+  iframe[src*="wonderchat"],
+  [id*="wonderchat"],
+  [class*="wonderchat"] {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+  }
+}

@@ -1,0 +1,77 @@
+.thm-table {
+  .ant-table {
+    @apply rounded-2xl;
+    .ant-table-container {
+      @apply rounded-2xl;
+      .ant-table-content {
+        @apply rounded-2xl;
+      }
+      .ant-table-thead {
+        th {
+          @apply p-2 py-3;
+          &::before {
+            @apply hidden;
+          }
+        }
+      }
+      .ant-table-content {
+        .ant-table-tbody {
+          td {
+            @apply p-2 py-3;
+          }
+        }
+      }
+    }
+  }
+  &.user-data-table {
+    .ant-table {
+      .ant-table-container {
+        .ant-table-thead {
+          th {
+            @apply p-2 py-3 bg-transparent;
+            &::before {
+              @apply hidden;
+            }
+
+            &:first-child {
+              @apply pl-6;
+            }
+          }
+        }
+        .ant-table-tbody > tr > td:first-child {
+          @apply pl-6;
+        }
+        .ant-table-tbody > tr:last-child > td {
+          @apply border-b-0;
+        }
+        .ant-table-content {
+          .ant-table-tbody {
+            td {
+              span,
+              p {
+                &.ant-typography.ant-typography-secondary {
+                  @apply text-muted-foreground text-sm;
+                }
+              }
+              .action-btn-wrapper {
+                &.ant-space {
+                  @apply w-[82%] justify-end;
+                  .action-btn {
+                    &.ant-btn {
+                      @apply w-8 h-8 rounded-lg;
+                    }
+                  }
+                }
+              }
+              .table-tag {
+                &.ant-tag {
+                  @apply rounded-3xl bg-transparent border border-[#0000001a] font-medium;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

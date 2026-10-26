@@ -1,0 +1,194 @@
+.thm-form.ant-form {
+  .ant-form-item {
+    @apply mb-4;
+    .ant-form-item-label {
+      label {
+        @apply text-sm leading-none font-semibold w-full;
+        .lp-label {
+          @apply flex items-center justify-between w-full;
+          a {
+            @apply text-blue hover:underline;
+          }
+        }
+      }
+    }
+    .ant-form-item-control-input {
+      // @apply ;
+      .ant-input {
+        @apply text-foreground w-full text-sm border-0 px-3 bg-[#f3f3f5] rounded-[14px] min-h-12;
+        &::placeholder {
+          @apply text-muted-foreground;
+        }
+      }
+      .ant-input-password {
+        @apply text-foreground w-full text-sm border-0 bg-[#f3f3f5] rounded-[14px] min-h-12;
+        .ant-input {
+          @apply px-0 bg-transparent rounded-none min-h-auto;
+        }
+        .ant-input-suffix {
+          .ant-input-password-icon {
+            @apply text-muted-foreground w-5 h-5 cursor-pointer;
+          }
+        }
+      }
+    }
+    .ant-form-item-additional {
+      .ant-form-item-explain {
+        .ant-form-item-explain-error {
+          @apply my-2 text-xs;
+        }
+      }
+    }
+    &.checkbox-wrapper {
+      .ant-form-item-control-input {
+        @apply bg-transparent min-h-auto rounded-none;
+        .ant-checkbox-label {
+          @apply text-sm font-medium cursor-pointer leading-tight;
+          .check-link {
+            @apply text-blue hover:underline;
+          }
+        }
+      }
+    }
+    &.otp-form-item {
+      @apply max-w-[240px] mx-auto;
+      .ant-otp {
+        @apply gap-1;
+        .ant-otp-input-wrapper {
+          .ant-otp-input {
+            @apply rounded-none min-h-9;
+          }
+        }
+        .ant-otp-input-wrapper:first-child {
+          .ant-otp-input {
+            @apply rounded-l-xl;
+          }
+        }
+        .ant-otp-input-wrapper:last-child {
+          .ant-otp-input {
+            @apply rounded-r-xl;
+          }
+        }
+      }
+      .otp-code-info {
+        @apply flex justify-center items-center text-xs font-normal gap-2 text-primary mt-2;
+      }
+    }
+  }
+  &.profile-form {
+    .pf-grid-box {
+      @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+    }
+    .ant-form-item {
+      @apply mb-6;
+    }
+    .thm-btn.save-btn {
+      @apply px-4;
+    }
+  }
+  &.security-form {
+    @apply max-w-md;
+      .thm-btn.update-btn {
+      @apply px-4;
+    }
+  }
+}
+
+.thm-select {
+  &.ant-select {
+    @apply w-full h-[36px] rounded-[0.875rem] bg-[#f3f3f5];
+    &.ant-select-filled.ant-select-focused {
+      @apply border-transparent;
+    }
+    .ant-select-placeholder {
+      @apply text-muted-foreground text-sm font-normal;
+    }
+    .ant-select-selection-item {
+      @apply flex items-center;
+      .user-option-content {
+        @apply flex flex-col;
+        .user-option-name {
+          @apply text-sm font-normal text-foreground;
+        }
+        .user-option-role {
+          @apply text-xs text-muted-foreground;
+        }
+      }
+    }
+  }
+}
+
+// User option styles in dropdown
+.thm-select-dropdown {
+  &.ant-select-dropdown {
+    @apply bg-[#fff] shadow-md border border-[#0000001a]/40 rounded-2xl p-2;
+    .ant-select-item {
+      @apply py-3 px-4 relative;
+      &.ant-select-item-option-selected {
+        @apply bg-[#f1f5f9];
+        .user-option-content {
+          .user-option-name {
+            @apply text-foreground;
+          }
+        }
+        &::after {
+          content: "✓";
+          @apply absolute right-4 top-1/2 -translate-y-1/2 text-blue text-sm font-semibold;
+        }
+      }
+
+      .ant-select-item-option-content {
+        @apply flex items-center justify-between;
+        .user-option-content {
+          @apply flex-1;
+        }
+      }
+    }
+    .ant-select-item-option {
+      @apply rounded-xl;
+      &:hover {
+        @apply bg-[#f1f5f9];
+      }
+      &.ant-select-item-option-active,
+      &.ant-select-item-option-selected {
+        @apply bg-[#f1f5f9];
+      }
+    }
+    .user-option-content {
+      @apply flex flex-col;
+      .user-option-name {
+        @apply text-xs font-normal text-foreground;
+      }
+      .user-option-role {
+        @apply text-xs text-muted-foreground mt-0.5;
+      }
+    }
+  }
+}
+
+// .thm-select.ant-select-focused {
+//   &.ant-select-outlined {
+//     &:not(.ant-select-disabled) {
+//       .ant-select-selector {
+//         @apply shadow-none!;
+//       }
+//     }
+//   }
+// }
+// .thm-select.ant-select {
+//   &:not(.ant-select-disabled) {
+//     .ant-select-selector {
+//       @apply border-[rgba(0,51,102,0.2)]!;
+//       &:hover {
+//         @apply border-primary!;
+//       }
+//     }
+//   }
+// }
+// .thm-select-popup {
+//   &.ant-select-dropdown {
+//     .ant-select-item-option-selected {
+//       @apply bg-[#dff7ef]!;
+//     }
+//   }
+// }
